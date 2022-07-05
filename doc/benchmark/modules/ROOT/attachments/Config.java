@@ -1,0 +1,1 @@
+../../../../../benchmark/src/main/java/org/keycloak/benchmark/Config.java
