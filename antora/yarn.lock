@@ -11,13 +11,13 @@
     "@antora/user-require-helper" "~2.0"
     "@asciidoctor/core" "~2.2"
 
-"@antora/cli@^3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@antora/cli/-/cli-3.1.0.tgz#074974bef60036c307d4633859134f4eba8384c2"
-  integrity sha512-TjVU2W0cfSSR6yRq2dEQphJNrUPjKCP+lzx/RIU1XJRq0D93BU3bMdmc+ZyjLMfXLItxg2kiUeSzJXZeDlOZ1A==
+"@antora/cli@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@antora/cli/-/cli-3.1.1.tgz#5287611415306addfab300756d633946b35a409a"
+  integrity sha512-YmwuUgvWQt2Do3zAByMQW+a3GfAPkUs0k2OKVCiuAQD51TUyDoeK4qSE3lYMzpInKf9ps1DardBssSnibDYZXA==
   dependencies:
-    "@antora/logger" "3.1.0"
-    "@antora/playbook-builder" "3.1.0"
+    "@antora/logger" "3.1.1"
+    "@antora/playbook-builder" "3.1.1"
     "@antora/user-require-helper" "~2.0"
     commander "~9.4"
 
@@ -85,6 +85,16 @@
     pino-pretty "~9.0"
     sonic-boom "~3.2"
 
+"@antora/logger@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@antora/logger/-/logger-3.1.1.tgz#2befe5aa3467a80c50aa9664a995452fba56433d"
+  integrity sha512-V62YLE59z6KDQbCKjzHAv1zE7FHfT9pSwhLsHYJbWa2e8CGbGKflaR8hiDnvKSqs71VFxbdbkcOdbu7hAjGiEw==
+  dependencies:
+    "@antora/expand-path-helper" "~2.0"
+    pino "~8.4"
+    pino-pretty "~9.0"
+    sonic-boom "~3.2"
+
 "@antora/lunr-extension@^1.0.0-alpha.8":
   version "1.0.0-alpha.8"
   resolved "https://registry.yarnpkg.com/@antora/lunr-extension/-/lunr-extension-1.0.0-alpha.8.tgz#7a72afd3e890caebd6cfcb6933370a558a1d8b9f"
@@ -115,6 +125,16 @@
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@antora/playbook-builder/-/playbook-builder-3.1.0.tgz#c338da74d305c85f3a39277fea7a3058b7cd0b92"
   integrity sha512-z+MMYDSnKLq4qoOljYILBv5jXv2ZKkdpzg2areSloKw6JCTgVKiBWqwOjFbE3wbd2KwvGaAT27Un8DVhfCArIQ==
+  dependencies:
+    "@iarna/toml" "~2.2"
+    convict "~6.2"
+    js-yaml "~4.1"
+    json5 "~2.2"
+
+"@antora/playbook-builder@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@antora/playbook-builder/-/playbook-builder-3.1.1.tgz#874d4eae00bc215b58b3d1a87be3559f94120902"
+  integrity sha512-HQ+E9Zn7upeThKxrGozRzRSymb0wUwUAtqHaHscOfj7IuDWI7kmjHfmS9td10tU3Oe2VdXiInnOeXMPpN/lPYQ==
   dependencies:
     "@iarna/toml" "~2.2"
     convict "~6.2"
