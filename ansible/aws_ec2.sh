@@ -7,8 +7,8 @@ REGION=$2
 
 case $OPERATION in
   requirements)
+    pipx install --user boto3 botocore
     ansible-galaxy collection install -r requirements.yml
-    pip3 install --user boto3 botocore
   ;;
   create|delete|start|stop)
     if [ -f "env.yml" ]; then CUSTOM_VARS_ARG="-e @env.yml"; fi
