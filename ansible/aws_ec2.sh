@@ -7,7 +7,6 @@ REGION=$2
 
 case $OPERATION in
   requirements)
-    pipx install boto3 botocore
     ansible-galaxy collection install -r requirements.yml
   ;;
   create|delete|start|stop)
