@@ -14,8 +14,7 @@ runs:
       shell: bash
       run: |
         ./aws_ec2.sh requirements
-        pipx install boto3 --include-deps
-        pipx install botocore --include-deps
+        /opt/pipx/venvs/ansible-core/bin/python -m pip boto3 botocore
       working-directory: ansible
 
     - id: create-ec2-instances
