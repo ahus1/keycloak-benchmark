@@ -27,7 +27,7 @@ The installation process is automated in the `rosa_create_cluster.sh` script in 
 
 It loads environment variables pre-set in `.env` file inside the `aws/` directory.
 
-The script creates the OCP cluster via `rosa create cluster` command, additionally it creates the required operator roles and OIDC provider.
+The script creates the OpenShift cluster via `rosa create cluster` command, additionally it creates the required operator roles and OIDC provider.
 After the installation process is finished, it creates a new admin user.
 
 .Example `.env` file
@@ -44,10 +44,10 @@ If no `ADMIN_PASSWORD` is provided in the configuration, it reads it from the AW
 
 === Mandatory parameters
 
-`VERSION`:: OCP cluster version.
+`VERSION`:: OpenShift cluster version.
 `REGION`:: AWS region where the cluster should run.
-`COMPUTE_MACHINE_TYPE`:: https://aws.amazon.com/ec2/instance-types/[AWS instance type] for the default OCP worker machine pool.
-`MULTI_AZ`:: Boolean parameter to indicate whether the OCP cluster should span multiple Availability Zones within the selected region.
+`COMPUTE_MACHINE_TYPE`:: https://aws.amazon.com/ec2/instance-types/[AWS instance type] for the default OpenShift worker machine pool.
+`MULTI_AZ`:: Boolean parameter to indicate whether the OpenShift cluster should span many Availability Zones within the selected region.
 `AVAILABILITY_ZONES`:: Comma separated list of Availability Zones to use for the cluster. For example, `eu-central-1a,eu-central-1b`.
 `REPLICAS`:: Number of worker nodes.
 If multi-AZ installation is selected, then this needs to be a multiple of the number of AZs available in the region.
@@ -86,20 +86,21 @@ The above installation script creates an admin user automatically but in case th
 == Scaling the cluster's nodes on demand
 
 The standard setup of nodes might be too small for running a load test, at the same time using a different instance type and rebuilding the cluster takes a lot of time (about 45 minutes).
-To scale the cluster on demand, the standard setup has a machine pool named `scaling` with instances of type `m5.4xlarge` spot instances which is scaled to zero by default.
+To scale the cluster on demand, the standard setup has a machine pool named `scaling` with instances of type `m5.4xlarge` which is auto-scaled based on the current demand from 0 to 10 instances.
+However, auto-scaling of worker nodes is quite time-consuming as nodes are scaled one by one.
 
-To scale the machine pool at runtime, issue a command like the following, and the additional nodes will be available within about 5 minutes:
-
-[source,bash,subs=+quotes]
-----
-rosa edit machinepool -c _**clustername**_ --min-replicas 3 --max-replicas 10 scaling
-----
-
-To scale down the cluster, use a command like the following:
+To scale the machine pool faster, issue a command like the following, and the additional nodes will be spawned at the same time:
 
 [source,bash,subs=+quotes]
 ----
-rosa edit machinepool -c _**clustername**_ --min-replicas 0 --max-replicas 0 scaling
+rosa edit machinepool -c _**clustername**_ --min-replicas 3 scaling
+----
+
+To allow scaling the machine pool back to 0, use a command like the following:
+
+[source,bash,subs=+quotes]
+----
+rosa edit machinepool -c _**clustername**_ --min-replicas 0 scaling
 ----
 
 To use different instance types, use `rosa create machinepool` to create additional machine pools
@@ -119,11 +120,12 @@ The following docs have been used to set up EFS:
 
 * https://docs.openshift.com/rosa/storage/container_storage_interface/osd-persistent-storage-aws-efs-csi.html[Official OpenShift docs: Setting up AWS Elastic File Service CSI Driver Operator]
 * https://mobb.ninja/docs/rosa/aws-efs/[Community docs: Enabling the AWS EFS CSI Driver Operator on ROSA]
-* https://access.redhat.com/articles/6966373[Red Hat knowledge base article: AWS EFS CSI Driver Operator installation guide in OCP]
+* https://access.redhat.com/articles/6966373[Red Hat Knowledgebase article: AWS EFS CSI Driver Operator installation guide in OpenShift]
 
 == Rotate admin user password
 
-The admin user password can be rotated via the `rosa_rotate_admin_password.sh` script.Note admin password for existing clusters are not updated.
+The admin user password can be rotated via the `rosa_rotate_admin_password.sh` script.
+Note the admin password for existing clusters is not updated.
 The new password can be applied using script `rosa_recreate_admin.sh` with corresponding `CLUSTER_NAME` variable.
 
 == Uninstallation

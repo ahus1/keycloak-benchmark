@@ -36,9 +36,9 @@ KC_CONTAINER_IMAGE=localhost/keycloak:local
 ----
 +
 To learn more about the `.env` file, see xref:customizing-deployment.adoc[].
-. Build the container, either with podman or with docker.
+. Build the container, either with Podman or with Docker.
 +
-.When running podman
+.When running Podman
 [source,bash]
 ----
 cd quarkus/container
@@ -47,7 +47,7 @@ podman build --build-arg KEYCLOAK_DIST=$(ls keycloak-*.tar.gz) . -t keycloak:loc
 podman image save keycloak:local | minikube image load --overwrite=true -
 ----
 +
-.When running docker
+.When running Docker
 [source,bash]
 ----
 cd quarkus/container
@@ -56,6 +56,53 @@ eval $(minikube docker-env)
 docker build --build-arg KEYCLOAK_DIST=$(ls keycloak-*.tar.gz) . -t localhost/keycloak:local
 ----
 +
+. Run `task` as usual to deploy the image.
++
+[source]
+----
+task
+----
+
+== Building a custom Keycloak image for OpenShift
+
+. Check out https://github.com/keycloak/keycloak[Keycloak's Git repository].
+. Build using `mvn clean install -DskipTests` to create a `keycloak-999.0.0-SNAPSHOT.tar.gz` in folder `/quarkus/dist/target`.
+. Build the container, either with Podman or with Docker.
++
+In the following examples, replace `quay.io` and `quay.io/namespace/repository:tag` with the registry and the image name you are using.
++
+.When running Podman
+[source,bash]
+----
+cd quarkus/container
+cp ../dist/target/keycloak-*.tar.gz .
+IMAGE_NAME=quay.io/namespace/repository:tag
+podman build --build-arg KEYCLOAK_DIST=$(ls keycloak-*.tar.gz) . -t $IMAGE_NAME
+podman login quay.io
+podman push $IMAGE_NAME
+----
++
+.When running Docker
+[source,bash]
+----
+cd quarkus/container
+cp ../dist/target/keycloak-*.tar.gz .
+IMAGE_NAME=quay.io/namespace/repository:tag
+docker build --build-arg KEYCLOAK_DIST=$(ls keycloak-*.tar.gz) . -t $IMAGE_NAME
+docker login quay.io
+docker push $IMAGE_NAME
+----
++
+. Configure the OpenShift environment to use the custom image.
++
+In the following example, replace `quay.io/namespace/repository:tag` with the registry and the image name you are using.
++
+.Example entry in the `provision/openshift/.env` file
+----
+KC_CONTAINER_IMAGE=quay.io/namespace/repository:tag
+----
++
+To learn more about the `.env` file, see xref:customizing-deployment.adoc[].
 . Run `task` as usual to deploy the image.
 +
 [source]

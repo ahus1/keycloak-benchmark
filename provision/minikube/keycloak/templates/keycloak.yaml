@@ -204,17 +204,17 @@ spec:
                 value: "10000"
 {{ end }}
               - name: JAVA_OPTS_APPEND
-                # using non-blocking random, make DNS lookups expire after 10 seconds and not cache them forever
+                # jgroups.thread_dumps_threshold ensure that a log message "thread pool is full" appears once the thread pool is full for the first time
                 value: >
                   -Xms{{ .Values.heapInitMB }}m -Xmx{{ .Values.heapMaxMB }}m
                   -XX:MetaspaceSize={{ .Values.metaspaceInitMB }}m -XX:MaxMetaspaceSize={{ .Values.metaspaceMaxMB }}m
+                  -Djgroups.thread_dumps_threshold=1
                   -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
 {{- if .Values.otel }}
                   -javaagent:/otel/opentelemetry-javaagent-{{ .Values.otelVersion }}.jar
 {{- end -}}
 {{- if .Values.cryostat }}
                   -Dcom.sun.management.jmxremote.port=9091 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
-                  -XX:FlightRecorderOptions=stackdepth=512
 {{- end }}
 {{- if .Values.infinispan.site }}
                   -Djboss.site.name={{.Values.infinispan.site}}
@@ -248,26 +248,21 @@ spec:
               failureThreshold: 600
               initialDelaySeconds: 10
               periodSeconds: 2
+            # During Keycloak Infinispan view updates for members leaving and rebalancing, there is an increased latency for all requests, observed with up to 10 seconds.
+            # With all requests being queued, also the liveness probe is queue, and is therefore slow.
+            # In a high-load or even overload scenario, the probes will be queued in the executor thread pool, and won't return in time.
+            # With load shedding activated when requests are rejected from the executor thread pool, failing readiness probes will lead to Pods not receiving any load for
+            # a period or time, and with failing liveness probes the Pods will eventually be restarted. So the best way to run Keycloak in Kubernetes would be to disable
+            # those probes for now.
+            # https://github.com/keycloak/keycloak/issues/22109
             readinessProbe:
-              httpGet:
-                path: /health/ready
-                port: 8443
-                scheme: HTTPS
-              failureThreshold: 3
-              periodSeconds: 30
-              # During Keycloak Infinispan view updates for members leaving and rebalancing, there is an increased latency for all requests, observed with up to 10 seconds
-              # With all requests being queued, also the liveness probe is queue, and is therefore slow.
-              timeoutSeconds: 20
+              exec:
+                command:
+                  - 'true'
             livenessProbe:
-              httpGet:
-                path: /health/live
-                port: 8443
-                scheme: HTTPS
-              failureThreshold: 3
-              periodSeconds: 30
-              # During Keycloak Infinispan view updates for members leaving and rebalancing, there is an increased latency for all requests, observed with up to 10 seconds
-              # With all requests being queued, also the liveness probe is queue, and is therefore slow.
-              timeoutSeconds: 20
+              exec:
+                command:
+                  - 'true'
             volumeMounts:
               - name: keycloak-providers
                 mountPath: /opt/keycloak/providers
