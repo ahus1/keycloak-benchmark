@@ -19,7 +19,7 @@ spec:
   db:
 {{ if or (eq .Values.database "aurora-postgres") (eq .Values.database "postgres") (eq .Values.database "postgres+infinispan") }}
     vendor: postgres
-    url: jdbc:postgresql://postgres:5432/keycloak
+    url: jdbc:aws-wrapper:postgresql://{{ .Values.dbUrl }}:5432/keycloak
 {{ end }}
     poolMinSize: {{ .Values.dbPoolMinSize }} # <1>
     poolInitialSize: {{ .Values.dbPoolInitialSize }}
@@ -53,6 +53,10 @@ spec:
       value: {{ base .Values.infinispan.configFile }}
   # end::keycloak-ispn[]
 {{- end }}
+    - name: db-driver
+      value: software.amazon.jdbc.Driver
+    - name: transaction-xa-enabled
+      value: 'false'
 {{ if or (eq .Values.database "infinispan") (eq .Values.database "postgres+infinispan") }}
     - name: storage-hotrod-host
       value: infinispan
@@ -266,7 +270,8 @@ spec:
                 # end::keycloak-ispn[]
 {{ end }}
               - name: keycloak-providers
-                mountPath: /opt/keycloak/providers
+                mountPath: /opt/keycloak/providers/keycloak-benchmark-dataset-0.12-SNAPSHOT.jar
+                subPath: keycloak-benchmark-dataset-0.12-SNAPSHOT.jar
                 readOnly: true
 {{ if .Values.infinispan.jgroupsTls }}
               - name: cache-embedded-mtls-volume
